@@ -10,6 +10,7 @@ from django.views import View
 from django.urls import reverse_lazy
 from rest_framework import viewsets
 from .serializers import ItemSerializer
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 class ItemViewSet(viewsets.ModelViewSet):
@@ -63,7 +64,7 @@ class ItemDetailView(DetailView):
 
 # this is class based view for create item
 
-class CreateItem(CreateView):
+class CreateItem(LoginRequiredMixin,CreateView):
     model = Item;
     fields = ['item_name','item_desc','item_price','item_image']
     template_name = 'food/item-form.html'
@@ -89,7 +90,7 @@ class CreateItem(CreateView):
 #     template_name = 'food/item-form.html'
 #     success_url = reverse_lazy('food:index')
 
-class UpdateItemView(View):
+class UpdateItemView(LoginRequiredMixin,View):
     template_name = 'food/item-form.html'
 
     def get(self, request, id):
@@ -117,7 +118,7 @@ class UpdateItemView(View):
 #         return redirect('food:index')
 #     return render(request, 'food/item-delete.html',{'item':item})
 
-class DeleteItemView(View):
+class DeleteItemView(LoginRequiredMixin,View):
     template_name = 'food/item-delete.html'
 
     def get(self, request, id):
