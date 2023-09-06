@@ -1,1 +1,10 @@
-<h1>You have been logged out</h1>
+{% extends 'food/base.html'%}
+{% block body %}
+
+
+<div >
+    <h1>You have been logged out</h1>
+   <p><span><a href="{% url 'login' %}">Click here</a>to login back</span></p>
+</div>
+
+{% endblock %}

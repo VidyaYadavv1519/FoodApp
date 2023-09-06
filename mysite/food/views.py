@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponse
 from .models import Item
 from django.template import loader
@@ -28,7 +28,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class IndexClassView(ListView):
-    model = Item;
+    model = Item
     template_name = 'food/index.html'
     context_object_name = 'item_list'
 
@@ -65,7 +65,7 @@ class ItemDetailView(DetailView):
 # this is class based view for create item
 
 class CreateItem(LoginRequiredMixin,CreateView):
-    model = Item;
+    model = Item
     fields = ['item_name','item_desc','item_price','item_image']
     template_name = 'food/item-form.html'
 
@@ -94,10 +94,23 @@ class UpdateItemView(LoginRequiredMixin,View):
     template_name = 'food/item-form.html'
 
     def get(self, request, id):
-        item = Item.objects.get(id=id)
+        item = get_object_or_404(Item, id=id)
         form = ItemForm(instance=item)
-        context = {'form': form, 'item': item}
-        return render(request, self.template_name, context)
+        return render(request, self.template_name, {'form': form, 'item': item})
+
+    def post(self, request, id):
+        item = get_object_or_404(Item, id=id)
+        form = ItemForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect('food:index')
+        return render(request, self.template_name, {'form': form, 'item': item})
+
+    # def get(self, request, id):
+    #     item = Item.objects.get(id=id)
+    #     form = ItemForm(instance=item)
+    #     context = {'form': form, 'item': item}
+    #     return render(request, self.template_name, context)
 
     def post(self, request, id):
         item = Item.objects.get(id=id)
@@ -109,6 +122,9 @@ class UpdateItemView(LoginRequiredMixin,View):
 
         context = {'form': form, 'item': item}
         return render(request, self.template_name, context)
+
+
+
 
 # def delete_item(request,id):
 #     item = Item.objects.get(id=id)
@@ -122,13 +138,11 @@ class DeleteItemView(LoginRequiredMixin,View):
     template_name = 'food/item-delete.html'
 
     def get(self, request, id):
-        item = Item.objects.get(id=id)
-        context = {'item': item}
-        return render(request, self.template_name, context)
+        item = get_object_or_404(Item, id=id)
+        return render(request, self.template_name, {'item': item})
 
     def post(self, request, id):
-        item = Item.objects.get(id=id)
-
+        item = get_object_or_404(Item, id=id)
         if request.method == 'POST':
             item.delete()
             return redirect('food:index')
